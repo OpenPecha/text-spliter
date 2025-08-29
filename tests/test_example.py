@@ -1,4 +1,4 @@
-from project_name.example import add_one
+from text_spliter.example import add_one
 
 
 def test_add_one():
