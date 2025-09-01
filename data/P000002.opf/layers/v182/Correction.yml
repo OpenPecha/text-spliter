@@ -1,0 +1,83 @@
+id: b35ec00eef944d91a8cb5d3d39955dc6
+annotation_type: Correction
+revision: '00001'
+annotations:
+  555c81a1810a4cebb6e388639cdab7f8:
+    correction: རྟོགས་
+    span:
+      start: 18357
+      end: 18361
+  92d9ef413bb24f9ba0e6c15a6b87856c:
+    correction: གྱི་
+    span:
+      start: 27819
+      end: 27822
+  609bbf873efe445a87466543d77c76cc:
+    correction: གི་
+    span:
+      start: 182291
+      end: 182294
+  dee6017439254376a481b5994daa7c47:
+    correction: སྨྲ་
+    span:
+      start: 308073
+      end: 308075
+  67db45d1992f4172a98342ea60464455:
+    correction: ལེན་
+    span:
+      start: 344654
+      end: 344658
+  3483c81149d94497b72a667d05fdca83:
+    correction: ཇི་
+    span:
+      start: 422695
+      end: 422697
+  3c1b48dd81eb4f86b7697b7a5b88924d:
+    correction: ཉིང་
+    span:
+      start: 841231
+      end: 841234
+  32d9c9c0d7a2405f8a68e531eb456eb8:
+    correction: རི་
+    span:
+      start: 1001785
+      end: 1001786
+  651b88bb7ebf4db491b86a403b2cb7e6:
+    correction: སྐྱེ་
+    span:
+      start: 1150633
+      end: 1150636
+  7df2ac2c0cb34ae8a982c4cbf184b6de:
+    correction: དེ་
+    span:
+      start: 1178011
+      end: 1178012
+  4254717f90a5492b840f2517e961af0d:
+    correction: ཕན་
+    span:
+      start: 1190438
+      end: 1190440
+  698a6951bb824695a2326c374580148d:
+    correction: ན་ནི་
+    span:
+      start: 1250887
+      end: 1250889
+  b3df1998070043d3806cda617d31c49b:
+    correction: མྱོང་
+    span:
+      start: 1283260
+      end: 1283263
+local_ids:
+  555c81a1810a4cebb6e388639cdab7f8: 200000
+  92d9ef413bb24f9ba0e6c15a6b87856c: 200001
+  609bbf873efe445a87466543d77c76cc: 200002
+  dee6017439254376a481b5994daa7c47: 200003
+  67db45d1992f4172a98342ea60464455: 200004
+  3483c81149d94497b72a667d05fdca83: 200005
+  3c1b48dd81eb4f86b7697b7a5b88924d: 200006
+  32d9c9c0d7a2405f8a68e531eb456eb8: 200007
+  651b88bb7ebf4db491b86a403b2cb7e6: 200008
+  7df2ac2c0cb34ae8a982c4cbf184b6de: 200009
+  4254717f90a5492b840f2517e961af0d: 200010
+  698a6951bb824695a2326c374580148d: 200011
+  b3df1998070043d3806cda617d31c49b: 200012

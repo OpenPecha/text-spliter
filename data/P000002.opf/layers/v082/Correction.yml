@@ -1,0 +1,35 @@
+id: 273fa865e25c42b1bc65319e77669fec
+annotation_type: Correction
+revision: '00001'
+annotations:
+  2c88680dca77445d9f5abb8ce901f214:
+    correction: བསྟེན་
+    span:
+      start: 70484
+      end: 70488
+  2f50010a4fef4421811fb2346b13ab4e:
+    correction: ལྟར་
+    span:
+      start: 257885
+      end: 257888
+  09651c3d1b494d0faf09bcb71d0fd76f:
+    correction: འདུས་
+    span:
+      start: 789039
+      end: 789042
+  946ead82f9f54ff081f5395a2cc954b6:
+    correction: བསྟན་
+    span:
+      start: 815577
+      end: 815581
+  28df9c4f37d147a89791edc8c8631094:
+    correction: དྲུག་
+    span:
+      start: 963833
+      end: 963836
+local_ids:
+  2c88680dca77445d9f5abb8ce901f214: 200000
+  2f50010a4fef4421811fb2346b13ab4e: 200001
+  09651c3d1b494d0faf09bcb71d0fd76f: 200002
+  946ead82f9f54ff081f5395a2cc954b6: 200003
+  28df9c4f37d147a89791edc8c8631094: 200004

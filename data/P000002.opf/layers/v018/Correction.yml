@@ -1,0 +1,23 @@
+id: ae884f8a47b94a069abc34edcba2d5df
+annotation_type: Correction
+revision: '00001'
+annotations:
+  0214b08df61347dcb30e35213ccf18d6:
+    correction: ཏུ་
+    span:
+      start: 63904
+      end: 63906
+  e5c3bb27784146f8bd066f2cc4a0af2a:
+    correction: བསྒོམས་
+    span:
+      start: 191771
+      end: 191777
+  ac8dcceae0e74204b9b7f800d54033de:
+    correction: གོ་
+    span:
+      start: 487389
+      end: 487391
+local_ids:
+  0214b08df61347dcb30e35213ccf18d6: 200000
+  e5c3bb27784146f8bd066f2cc4a0af2a: 200001
+  ac8dcceae0e74204b9b7f800d54033de: 200002
