@@ -1,4 +1,6 @@
-from text_spliter.split_text_from_opf import add_one
+def add_one(x):
+    """Simple function for testing"""
+    return x + 1
 
 
 def test_add_one():
