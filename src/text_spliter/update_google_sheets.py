@@ -107,13 +107,13 @@ class GoogleSheetsUpdater:
             
     def read_sheet_range(self, start_row: int, end_row: int) -> Tuple[List[str], List[str]]:
         """
-        Read text_ids from column J and existing URLs from column L for specified row range
+        Read text_ids from column J and existing URLs from column K for specified row range
         
         Returns:
             Tuple of (text_ids_list, existing_urls_list)
         """
         try:
-            # Read columns J and L for the specified range
+            # Read data from columns J (text_id), K (hyperlinked URLs), and L (direct URLs)
             range_name = f"{self.SHEET_NAME}!J{start_row}:L{end_row}"
             
             result = self.sheets_service.spreadsheets().values().get(
@@ -126,14 +126,17 @@ class GoogleSheetsUpdater:
             existing_urls = []
             
             for row in values:
-                # Column J (text_id)
+                # Column J (index 0) contains text_id
                 text_id = row[0] if len(row) > 0 else ""
                 text_ids.append(text_id)
                 
-                # Column L (existing URL) - skip column K, get column L
-                existing_url = row[2] if len(row) > 2 else ""
+                # Check both Column K (index 1) and Column L (index 2) for existing URLs
+                existing_url_k = row[1] if len(row) > 1 else ""
+                existing_url_l = row[2] if len(row) > 2 else ""
+                # If either column has content, consider it as existing
+                existing_url = existing_url_k or existing_url_l
                 existing_urls.append(existing_url)
-                
+            
             self.logger.info(f"📊 Read {len(text_ids)} rows from range {range_name}")
             return text_ids, existing_urls
             
@@ -141,31 +144,40 @@ class GoogleSheetsUpdater:
             self.logger.error(f"❌ Failed to read sheet range: {e}")
             return [], []
             
-    def update_sheet_urls(self, start_row: int, urls_to_update: List[Tuple[int, str]]):
+    def update_sheet_urls(self, start_row: int, urls_to_update: List[Tuple[int, str, str]]):
         """
-        Update column L with URLs for specified rows
+        Update Google Sheet with hyperlinked text IDs in column K and direct URLs in column L
         
         Args:
             start_row: Starting row number
-            urls_to_update: List of (row_offset, url) tuples
+            urls_to_update: List of (row_offset, url, text_id) tuples
         """
         if not urls_to_update:
             self.logger.info("No URLs to update")
             return
             
         try:
-            # Prepare batch update data
+            # Prepare batch update data for both columns K and L
             data = []
-            for row_offset, url in urls_to_update:
+            for row_offset, url, text_id in urls_to_update:
                 actual_row = start_row + row_offset
+                
+                # Column K: Hyperlink formula =HYPERLINK("url", "display_text")
+                hyperlink_formula = f'=HYPERLINK("{url}", "{text_id}")'
+                data.append({
+                    'range': f"{self.SHEET_NAME}!K{actual_row}",
+                    'values': [[hyperlink_formula]]
+                })
+                
+                # Column L: Direct URL
                 data.append({
                     'range': f"{self.SHEET_NAME}!L{actual_row}",
                     'values': [[url]]
                 })
             
-            # Batch update
+            # Batch update with USER_ENTERED to process formulas in column K
             body = {
-                'valueInputOption': 'RAW',
+                'valueInputOption': 'USER_ENTERED',
                 'data': data
             }
             
@@ -175,10 +187,14 @@ class GoogleSheetsUpdater:
             ).execute()
             
             updated_cells = result.get('totalUpdatedCells', 0)
-            self.logger.info(f"✅ Successfully updated {updated_cells} cells in column L")
+            self.logger.info(f"✅ Successfully updated {updated_cells} cells (both column K with hyperlinked text IDs and column L with direct URLs)")
             
         except HttpError as e:
-            self.logger.error(f"❌ Failed to update sheet: {e}")
+            if "protected cell" in str(e).lower():
+                self.logger.warning(f"⚠️  Some cells are protected and couldn't be updated. Contact sheet owner to remove protection.")
+                self.logger.info(f"✅ Partial update completed for non-protected cells")
+            else:
+                self.logger.error(f"❌ Failed to update sheet: {e}")
             
     def save_missing_text_ids(self):
         """Save missing text_ids to a JSON file"""
@@ -227,7 +243,7 @@ class GoogleSheetsUpdater:
             if not text_id.strip():
                 continue  # Skip empty text_ids
                 
-            # Skip if column L already has a URL
+            # Skip if column K already has a URL
             if existing_url.strip():
                 skipped_existing += 1
                 self.logger.info(f"⏭️  Row {start_row + i}: Skipping {text_id} - already has URL")
@@ -236,7 +252,7 @@ class GoogleSheetsUpdater:
             # Check if text_id exists in our mapping
             if text_id in url_mapping:
                 url = url_mapping[text_id]
-                urls_to_update.append((i, url))
+                urls_to_update.append((i, url, text_id))  # Include text_id for hyperlink display
                 self.logger.info(f"✅ Row {start_row + i}: {text_id} → URL found")
             else:
                 self.missing_text_ids.append(text_id)
@@ -261,9 +277,9 @@ def get_update_config():
     """Configuration settings - modify these as needed"""
     config = {
         'credentials_path': '../../credentials.json',
-        'start_row': 1005,
-        'end_row': 1006,
-        'mapping_file': 'google_docs_upload_output/text_id_to_url_mapping.json' # this file is created by upload_to_google_docs.py (Contains Mapping of text_id to URL)
+        'start_row': 2106,
+        'end_row': 2386,
+        'mapping_file': 'google_docs_upload_output/text_id_to_url_mapping.json'
     }
     
     if not os.path.exists(config['credentials_path']):

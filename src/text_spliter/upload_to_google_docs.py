@@ -139,22 +139,38 @@ class GoogleDocsUploader:
             self.logger.error(f"Failed to save progress: {e}")
             
     def _write_mapping_to_json(self):
-        """Write the URL mapping to JSON file at the end of execution"""
+        """Write the URL mapping to JSON file at the end of execution, merging with existing mappings"""
         if not self.doc_id_mapping:
             self.logger.info("No document mappings to save")
             return
             
         # Create URL mapping from document IDs
-        url_mapping = {}
+        new_url_mapping = {}
         for text_id, doc_id in self.doc_id_mapping.items():
-            url_mapping[text_id] = f"https://docs.google.com/document/d/{doc_id}/edit"
+            new_url_mapping[text_id] = f"https://docs.google.com/document/d/{doc_id}/edit"
         
-        # Save URL mapping
+        # Load existing mapping file if it exists
         url_mapping_file = os.path.join(self.output_dir, "text_id_to_url_mapping.json")
+        existing_mapping = {}
+        
+        if os.path.exists(url_mapping_file):
+            try:
+                with open(url_mapping_file, 'r') as f:
+                    existing_mapping = json.load(f)
+                self.logger.info(f"📖 Loaded {len(existing_mapping)} existing mappings from {url_mapping_file}")
+            except Exception as e:
+                self.logger.warning(f"Could not load existing mapping file: {e}")
+        
+        # Merge existing and new mappings
+        combined_mapping = existing_mapping.copy()
+        combined_mapping.update(new_url_mapping)
+        
+        # Save combined URL mapping
         try:
             with open(url_mapping_file, 'w') as f:
-                json.dump(url_mapping, f, indent=2)
-            self.logger.info(f"🔗 URL mapping saved to {url_mapping_file} ({len(url_mapping)} entries)")
+                json.dump(combined_mapping, f, indent=2)
+            self.logger.info(f"🔗 URL mapping saved to {url_mapping_file}")
+            self.logger.info(f"   📊 Total entries: {len(combined_mapping)} (added {len(new_url_mapping)} new)")
         except Exception as e:
             self.logger.error(f"Failed to save URL mapping: {e}")
             
@@ -379,8 +395,8 @@ def get_upload_config():
     """Configuration settings - modify these as needed"""
     config = {
         'credentials_path': '../../credentials.json',
-        'start_id': 'D2097',  # Change this to start from different text ID
-        'end_id': 'D2197',    # the end range u want.
+        'start_id': 'D3999',  # Change this to start from different text ID
+        'end_id': 'D4464',    # the end range u want.
         'delay': 1.0,         
         'progress_file': 'upload_progress_OAuth.json'
     }

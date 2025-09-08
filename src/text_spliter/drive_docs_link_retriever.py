@@ -112,22 +112,39 @@ class DriveDocumentLinker:
             
             self.logger.info(f"🔍 Executing Drive API query:\n   Query: {query}\n   Fields: files(id,name,webViewLink)")
             
-            results = self.drive_service.files().list(
-                q=query,
-                fields="files(id,name,webViewLink)",
-                supportsAllDrives=True,
-                pageSize=1000  # Adjust based on your document count
-            ).execute()
-            
-            files = results.get('files', [])
-            self.logger.info(f"📊 Raw API response: Found {len(files)} files")
-            
-            # Build filename -> webViewLink mapping
+            # Handle pagination to get ALL documents
             filename_to_link = {}
-            for file in files:
-                filename = file['name']
-                web_link = file['webViewLink']
-                filename_to_link[filename] = web_link
+            page_token = None
+            total_files = 0
+            
+            while True:
+                results = self.drive_service.files().list(
+                    q=query,
+                    fields="nextPageToken, files(id,name,webViewLink)",
+                    supportsAllDrives=True,
+                    pageSize=1000,
+                    pageToken=page_token
+                ).execute()
+                
+                files = results.get('files', [])
+                total_files += len(files)
+                
+                # Build filename -> edit link mapping (convert webViewLink to edit link)
+                for file in files:
+                    filename = file['name']
+                    doc_id = file['id']
+                    # Create edit link instead of webViewLink
+                    edit_link = f"https://docs.google.com/document/d/{doc_id}/edit"
+                    filename_to_link[filename] = edit_link
+                
+                # Check if there are more pages
+                page_token = results.get('nextPageToken')
+                if not page_token:
+                    break
+                    
+                self.logger.info(f"📄 Retrieved {total_files} documents so far, fetching next page...")
+            
+            self.logger.info(f"📊 Total documents retrieved: {total_files}")
             
             self.logger.info(f"✅ Successfully retrieved {len(filename_to_link)} document links from Google Drive")
             
@@ -177,14 +194,15 @@ class DriveDocumentLinker:
             print(f"🔗 {link}")
             print("-"*60)
     
-    def save_to_json(self, filename_to_link: Dict[str, str], output_file: str = "document_links.json"):
+    def save_to_json(self, filename_to_link: Dict[str, str], output_file: str = "text_id_to_url_mapping.json"):
         """
-        Save the filename -> link mapping to a JSON file
+        Save the filename -> link mapping to a JSON file in the format expected by update_google_sheets.py
         """
         try:
-            # Ensure output file is in the output directory
-            if not os.path.dirname(output_file):
-                output_file = os.path.join(self.output_dir, output_file)
+            # Save to drive_linker_output directory (separate from upload output)
+            output_dir = "drive_linker_output"
+            os.makedirs(output_dir, exist_ok=True)
+            output_file = os.path.join(output_dir, output_file)
             
             with open(output_file, 'w', encoding='utf-8') as f:
                 json.dump(filename_to_link, f, indent=2, ensure_ascii=False)

@@ -249,6 +249,61 @@ python3 update_google_sheets.py
 
    - Run `upload_to_google_docs.py` first
    - Check that `text_id_to_url_mapping.json` was generated
+   - Or use `drive_docs_link_retriever.py` to recover from existing Drive documents
+
+## Recovery Tool: Drive Document Link Retriever
+
+### Purpose
+
+`drive_docs_link_retriever.py` is a recovery tool that scans your Google Drive folder and rebuilds the URL mapping file from existing documents. This is useful when:
+
+- The mapping file is lost or corrupted
+- You need to verify which documents are already uploaded
+- You want to create a complete mapping without re-uploading
+
+### Usage
+
+```bash
+python3 drive_docs_link_retriever.py
+```
+
+### What It Does
+
+1. **Scans Google Drive**: Queries all Google Docs in the Tengyur folder
+2. **Handles Pagination**: Retrieves ALL documents (not just first 1000)
+3. **Generates Edit URLs**: Creates proper `/edit` URLs for sheet compatibility
+4. **Saves Mapping**: Outputs to `drive_linker_output/text_id_to_url_mapping.json`
+
+### Configuration
+
+Edit the `get_config()` function in the script:
+
+```python
+config = {
+    'credentials_path': '../../credentials.json',
+    'tengyur_folder_id': '1Ae6rQadtfxfwKICLC87szcJAUjqQI7PR',  # Your folder ID
+    'token_path': 'token.json'
+}
+```
+
+### Output Format
+
+Creates a JSON file with text_id → edit_url mappings:
+
+```json
+{
+  "D2097": "https://docs.google.com/document/d/1ABC123.../edit",
+  "D2098": "https://docs.google.com/document/d/1XYZ789.../edit"
+}
+```
+
+### Using with Sheets Update
+
+To use the recovered mapping with `update_google_sheets.py`:
+
+1. **Copy the file**:
+
+   Transfer the `text_id_to_url_mapping.json` file to `google_docs_upload_output` directory
 
 ### File Locations
 
@@ -256,5 +311,6 @@ All output files are created in respective directories:
 
 - `google_docs_upload_output/` - Upload script outputs
 - `google_sheets_update_output/` - Sheets script outputs
+- `drive_linker_output/` - Recovery tool outputs
 
 These directories are automatically created and are included in `.gitignore`.
